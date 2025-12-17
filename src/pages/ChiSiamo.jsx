@@ -67,7 +67,7 @@ export default function ChiSiamo() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="about-text-card"
+              className="about-text-card story-box"
             >
               <h2>La Nostra Storia</h2>
               <p>

@@ -522,12 +522,21 @@ a {
   z-index: 2;
 }
 
+.about-text-card.story-box {
+  background: white;
+  padding: 3rem;
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-lg);
+}
+
 .about-text-card h2 {
   font-size: 2.5rem;
   margin-bottom: 1.5rem;
   color: var(--dark);
-  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8),
-               0 0 20px rgba(255, 255, 255, 0.9);
+}
+
+.about-text-card.story-box h2 {
+  text-shadow: none;
 }
 
 .about-text-card p {
@@ -535,8 +544,10 @@ a {
   color: var(--dark);
   margin-bottom: 1.5rem;
   line-height: 1.8;
-  text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.8),
-               0 0 15px rgba(255, 255, 255, 0.9);
+}
+
+.about-text-card.story-box p {
+  text-shadow: none;
 }
 
 .about-text-card strong {
@@ -691,6 +702,13 @@ a {
 
 .service-description {
   padding: 4rem 0;
+}
+
+.service-description > .container > div {
+  background: white;
+  padding: 3rem;
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-lg);
 }
 
 .service-description h2 {

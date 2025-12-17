@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import BubbleParticles from './components/BubbleParticles';
+import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import ChiSiamo from './pages/ChiSiamo';
 import Divani from './pages/services/Divani';
@@ -16,6 +17,7 @@ import './App.css';
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="app">
         <BubbleParticles />
         <Navbar />
