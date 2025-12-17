@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Send, CheckCircle } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 
 export default function Preventivo() {
   const [formData, setFormData] = useState({
@@ -14,6 +15,8 @@ export default function Preventivo() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -23,25 +26,55 @@ export default function Preventivo() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Qui andrà la logica per inviare il form
-    console.log('Form data:', formData);
-    setSubmitted(true);
     
-    // Reset dopo 5 secondi
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({
-        nome: '',
-        cognome: '',
-        email: '',
-        telefono: '',
-        servizio: '',
-        messaggio: '',
-        privacy: false
-      });
-    }, 5000);
+    if (!formData.privacy) {
+      alert('Devi accettare la privacy policy per continuare');
+      return;
+    }
+
+    setSending(true);
+    setError(null);
+
+    try {
+      // Sostituisci questi valori con i tuoi da EmailJS
+      const serviceID = 'service_jzwhswu';
+      const templateID = 'template_64b32nu';
+      const publicKey = 'IqliX49QdHMP8-ifk';
+
+      const templateParams = {
+        from_name: `${formData.nome} ${formData.cognome}`,
+        from_email: formData.email,
+        phone: formData.telefono,
+        service: formData.servizio,
+        message: formData.messaggio,
+        to_name: 'BixPulito PRO',
+      };
+
+      await emailjs.send(serviceID, templateID, templateParams, publicKey);
+      
+      setSubmitted(true);
+      
+      // Reset dopo 5 secondi
+      setTimeout(() => {
+        setSubmitted(false);
+        setFormData({
+          nome: '',
+          cognome: '',
+          email: '',
+          telefono: '',
+          servizio: '',
+          messaggio: '',
+          privacy: false
+        });
+      }, 5000);
+    } catch (err) {
+      console.error('Errore invio email:', err);
+      setError('Si è verificato un errore. Riprova più tardi o contattaci direttamente.');
+    } finally {
+      setSending(false);
+    }
   };
 
   const services = [
@@ -207,9 +240,21 @@ export default function Preventivo() {
                 </label>
               </div>
 
-              <button type="submit" className="btn btn-primary btn-lg">
+              {error && (
+                <div style={{ 
+                  padding: '1rem', 
+                  backgroundColor: '#fee2e2', 
+                  color: '#dc2626', 
+                  borderRadius: '0.5rem',
+                  marginBottom: '1rem'
+                }}>
+                  {error}
+                </div>
+              )}
+
+              <button type="submit" className="btn btn-primary btn-lg" disabled={sending}>
                 <Send size={20} />
-                Invia Richiesta
+                {sending ? 'Invio in corso...' : 'Invia Richiesta'}
               </button>
             </form>
 
