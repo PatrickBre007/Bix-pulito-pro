@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Send, CheckCircle } from 'lucide-react';
-import emailjs from '@emailjs/browser';
 
 export default function Preventivo() {
   const [formData, setFormData] = useState({
@@ -15,18 +14,27 @@ export default function Preventivo() {
   });
 
   const [submitted, setSubmitted] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    // Se è il campo telefono, accetta solo numeri
+    if (name === 'telefono') {
+      const numericValue = value.replace(/\D/g, ''); // Rimuove tutto ciò che non è un numero
+      setFormData(prev => ({
+        ...prev,
+        [name]: numericValue
+      }));
+      return;
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     
     if (!formData.privacy) {
@@ -34,47 +42,53 @@ export default function Preventivo() {
       return;
     }
 
-    setSending(true);
-    setError(null);
+    // Costruisci l'oggetto dell'email
+    const subject = `Richiesta Preventivo - ${formData.servizio}`;
+    
+    // Costruisci il corpo dell'email
+    const body = `
+Nuova richiesta di preventivo da BIX PULITO PRO
 
-    try {
-      // Sostituisci questi valori con i tuoi da EmailJS
-      const serviceID = 'service_jzwhswu';
-      const templateID = 'template_64b32nu';
-      const publicKey = 'IqliX49QdHMP8-ifk';
+DATI CLIENTE:
+Nome: ${formData.nome} ${formData.cognome}
+Email: ${formData.email}
+Telefono: ${formData.telefono}
 
-      const templateParams = {
-        from_name: `${formData.nome} ${formData.cognome}`,
-        from_email: formData.email,
-        phone: formData.telefono,
-        service: formData.servizio,
-        message: formData.messaggio,
-        to_name: 'BixPulito PRO',
-      };
+SERVIZIO RICHIESTO:
+${formData.servizio}
 
-      await emailjs.send(serviceID, templateID, templateParams, publicKey);
-      
-      setSubmitted(true);
-      
-      // Reset dopo 5 secondi
-      setTimeout(() => {
-        setSubmitted(false);
-        setFormData({
-          nome: '',
-          cognome: '',
-          email: '',
-          telefono: '',
-          servizio: '',
-          messaggio: '',
-          privacy: false
-        });
-      }, 5000);
-    } catch (err) {
-      console.error('Errore invio email:', err);
-      setError('Si è verificato un errore. Riprova più tardi o contattaci direttamente.');
-    } finally {
-      setSending(false);
-    }
+MESSAGGIO:
+${formData.messaggio}
+
+---
+Questa richiesta è stata inviata dal form preventivo del sito web BIX PULITO PRO.
+    `.trim();
+
+    // Indirizzo email dove ricevere i preventivi
+    const emailDestinatario = 'info@bixpulitopro.it'; // Sostituisci con la tua email
+    
+    // Crea il link mailto
+    const mailtoLink = `mailto:${emailDestinatario}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // Apri il client email
+    window.location.href = mailtoLink;
+    
+    // Mostra messaggio di conferma
+    setSubmitted(true);
+    
+    // Reset dopo 5 secondi
+    setTimeout(() => {
+      setSubmitted(false);
+      setFormData({
+        nome: '',
+        cognome: '',
+        email: '',
+        telefono: '',
+        servizio: '',
+        messaggio: '',
+        privacy: false
+      });
+    }, 5000);
   };
 
   const services = [
@@ -190,7 +204,9 @@ export default function Preventivo() {
                     value={formData.telefono}
                     onChange={handleChange}
                     required
-                    placeholder="+39 123 456 7890"
+                    pattern="[0-9]*"
+                    inputMode="numeric"
+                    placeholder="3331234567"
                   />
                 </div>
               </div>
@@ -240,21 +256,9 @@ export default function Preventivo() {
                 </label>
               </div>
 
-              {error && (
-                <div style={{ 
-                  padding: '1rem', 
-                  backgroundColor: '#fee2e2', 
-                  color: '#dc2626', 
-                  borderRadius: '0.5rem',
-                  marginBottom: '1rem'
-                }}>
-                  {error}
-                </div>
-              )}
-
-              <button type="submit" className="btn btn-primary btn-lg" disabled={sending}>
+              <button type="submit" className="btn btn-primary btn-lg">
                 <Send size={20} />
-                {sending ? 'Invio in corso...' : 'Invia Richiesta'}
+                Invia Richiesta
               </button>
             </form>
 
